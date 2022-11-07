@@ -1,0 +1,16 @@
+C:\Users\SebRos\Desktop\repo\MusicPlayer\obj\Debug\MusicPlayer.csproj.AssemblyReference.cache
+C:\Users\SebRos\Desktop\repo\MusicPlayer\obj\Debug\MusicPlayer.csproj.SuggestedBindingRedirects.cache
+C:\Users\SebRos\Desktop\repo\MusicPlayer\obj\Debug\Interop.WMPLib.dll
+C:\Users\SebRos\Desktop\repo\MusicPlayer\obj\Debug\AxInterop.WMPLib.dll
+C:\Users\SebRos\Desktop\repo\MusicPlayer\obj\Debug\MusicPlayer.csproj.ResolveComReference.cache
+C:\Users\SebRos\Desktop\repo\MusicPlayer\obj\Debug\MusicPlayer.Properties.Resources.resources
+C:\Users\SebRos\Desktop\repo\MusicPlayer\obj\Debug\MusicPlayer.csproj.GenerateResource.cache
+C:\Users\SebRos\Desktop\repo\MusicPlayer\obj\Debug\MusicPlayer.csproj.CoreCompileInputs.cache
+C:\Users\SebRos\Desktop\repo\MusicPlayer\bin\Debug\MusicPlayer.exe.config
+C:\Users\SebRos\Desktop\repo\MusicPlayer\bin\Debug\MusicPlayer.exe
+C:\Users\SebRos\Desktop\repo\MusicPlayer\bin\Debug\MusicPlayer.pdb
+C:\Users\SebRos\Desktop\repo\MusicPlayer\bin\Debug\Interop.WMPLib.dll
+C:\Users\SebRos\Desktop\repo\MusicPlayer\bin\Debug\AxInterop.WMPLib.dll
+C:\Users\SebRos\Desktop\repo\MusicPlayer\obj\Debug\MusicPlayer.exe
+C:\Users\SebRos\Desktop\repo\MusicPlayer\obj\Debug\MusicPlayer.pdb
+C:\Users\SebRos\Desktop\repo\MusicPlayer\obj\Debug\MusicPlayer.Form.resources
