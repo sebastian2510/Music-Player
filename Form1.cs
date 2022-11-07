@@ -25,7 +25,6 @@ namespace MusicPlayer
         private void SongList_SelectedIndexChanged(object sender, EventArgs e)
         {
             //MessageBox.Show($"PRE: {SongList.SelectedIndex}");
-
             if (SongList.SelectedIndex > SongList.Items.Count || SongList.SelectedIndex < 0)
             {
                 SongList.SelectedIndex = 0;
@@ -67,17 +66,18 @@ namespace MusicPlayer
                 //MessageBox.Show($@"I: {index} | {paths[index]}");
                 file += Convert.ToString(dr.GetValue(2)) + ";";
             }
+
             path = path.Remove(path.Length - 1);
             file = file.Remove(file.Length - 1);
+
             paths = path.Split(';');
             files = file.Split(';');
-            //filter.Remover(files, out files);
+
             for (int i = 0; i < files.Length; i++)
             {
                 SongList.Items.Add(files[i]);
             }
 
-            //MessageBox.Show($@"{paths[6]}");
             dr.Close();
             cmd.Cancel();
             conn.Close();
@@ -90,7 +90,6 @@ namespace MusicPlayer
             NameFilter filter = new NameFilter();
             DBHandler db = new DBHandler();
             OpenFileDialog ofd = new OpenFileDialog();
-            //ofd.Filter = ".mp3";
             ofd.Multiselect = true;
             
             
@@ -123,18 +122,15 @@ namespace MusicPlayer
                     }
                 }
 
-
-
                 db.Insert(paths, files, ofd);
-
-
                 //MessageBox.Show($"Files: {Convert.ToString(files[0])}  | Paths: {Convert.ToString(paths[0])}");
-
             }
         }
 
         private void RemoveSong_Click(object sender, EventArgs e)
         {
+            Deleter del = new Deleter();
+
             string cstring = "server = 192.168.16.178; uid = Sebastian; pwd = 123Abcd123; DATABASE = Music;";
 
             SqlCommand cmd = new SqlCommand();
@@ -142,11 +138,10 @@ namespace MusicPlayer
             conn.Open();
 
             cmd = new SqlCommand($"DELETE FROM Songs WHERE song = '{files[SongList.SelectedIndex]}'", conn);
-            
             int rows = cmd.ExecuteNonQuery();
-            SongList.Items.Remove(files[SongList.SelectedIndex]);
             cmd.Cancel();
-            Deleter del = new Deleter();
+
+            SongList.Items.Remove(files[SongList.SelectedIndex]);
 
             for (int i = 0; i < SongList.Items.Count; i++)
             {
@@ -164,7 +159,7 @@ namespace MusicPlayer
     }
     class DBHandler
     {
-        /*
+        /* - Database creation
         CREATE DATABASE Music;
         CREATE TABLE Songs(
         id int PRIMARY KEY IDENTITY(1,1),
@@ -178,9 +173,9 @@ namespace MusicPlayer
         {
             NameFilter filter = new NameFilter();
             string cstring = "server = 192.168.16.178; uid = Sebastian; pwd = 123Abcd123; DATABASE = Music;";
+            int rows = 0;
 
             SqlCommand cmd = new SqlCommand();
-            int rows = 0;
             SqlConnection conn = new SqlConnection(cstring);
             conn.Open();
 
@@ -198,7 +193,7 @@ namespace MusicPlayer
     }
     class NameFilter
     {
-        public void Remover(string[] files, out string[] output)
+        public void Remover(string[] files, out string[] output) // This method breaks deletion-part etc.
         {
             for (int i = 0; i < files.Length; i++)
             {
@@ -229,7 +224,7 @@ namespace MusicPlayer
                     int endbracket = files[i].LastIndexOf(']');
                     files[i] = files[i].Remove(startbracket, endbracket - startbracket + 1);
                 }
-                /*
+                /* Might use later
                 if (files[i].Contains(".mp3"))
                 {
                     int start = files[i].IndexOf(".mp3");
@@ -255,6 +250,7 @@ namespace MusicPlayer
             int rem = file.IndexOf(files[i]);
             file.Remove(rem, file.IndexOf(';', rem));
             file.Remove(file.Length - 1);
+
             files = file.Split(';');
             output = files;
         }
