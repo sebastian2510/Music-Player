@@ -248,8 +248,8 @@ namespace MusicPlayer
             }
 
             int rem = file.IndexOf(files[i]);
-            file.Remove(rem, file.IndexOf(';', rem));
-            file.Remove(file.Length - 1);
+            file = file.Remove(rem, file.IndexOf(';', rem));
+            file = file.Remove(file.Length - 1);
 
             files = file.Split(';');
             output = files;
