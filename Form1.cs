@@ -153,8 +153,8 @@ namespace MusicPlayer
                 if (SongList.Items == null)
                 {
                     SongList.Items.RemoveAt(i);
-                    del.ArrDel(files, i);
-                    del.ArrDel(paths, i);
+                    del.ArrDel(files, i, out files);
+                    del.ArrDel(paths, i, out paths);
                 }
             }
 
@@ -243,7 +243,7 @@ namespace MusicPlayer
     }
     class Deleter
     {
-        public void ArrDel(string[] files, int i)
+        public void ArrDel(string[] files, int i, out string[] output)
         {
             string file = "";
 
@@ -252,11 +252,11 @@ namespace MusicPlayer
                 file += files[index] + ";";
             }
 
-            
             int rem = file.IndexOf(files[i]);
             file.Remove(rem, file.IndexOf(';', rem));
             file.Remove(file.Length - 1);
             files = file.Split(';');
+            output = files;
         }
     }
 }
