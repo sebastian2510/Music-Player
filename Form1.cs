@@ -146,13 +146,15 @@ namespace MusicPlayer
             int rows = cmd.ExecuteNonQuery();
             SongList.Items.Remove(files[SongList.SelectedIndex]);
             cmd.Cancel();
+            Deleter del = new Deleter();
 
             for (int i = 0; i < SongList.Items.Count; i++)
             {
                 if (SongList.Items == null)
                 {
                     SongList.Items.RemoveAt(i);
-                    
+                    del.ArrDel(files, i);
+                    del.ArrDel(paths, i);
                 }
             }
 
@@ -237,6 +239,24 @@ namespace MusicPlayer
                 */
             }
             output = files;
+        }
+    }
+    class Deleter
+    {
+        public void ArrDel(string[] files, int i)
+        {
+            string file = "";
+
+            for (int index = 0; index < files.Length; index++)
+            {
+                file += files[index] + ";";
+            }
+
+            
+            int rem = file.IndexOf(files[i]);
+            file.Remove(rem, file.IndexOf(';', rem));
+            file.Remove(file.Length - 1);
+            files = file.Split(';');
         }
     }
 }
