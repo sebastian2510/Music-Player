@@ -16,6 +16,7 @@ namespace MusicPlayer
     {
         string[] paths;
         string[] files;
+        
         public Form()
         {
             InitializeComponent();
@@ -24,10 +25,12 @@ namespace MusicPlayer
         private void SongList_SelectedIndexChanged(object sender, EventArgs e)
         {
             //MessageBox.Show($"PRE: {SongList.SelectedIndex}");
+
             if (SongList.SelectedIndex > SongList.Items.Count || SongList.SelectedIndex < 0)
             {
                 SongList.SelectedIndex = 0;
             }
+
             MediaPlayer.URL = paths[SongList.SelectedIndex];
             MessageBox.Show($@"Song: {files[SongList.SelectedIndex]} | Path: {paths[SongList.SelectedIndex]}");
         }
@@ -45,7 +48,6 @@ namespace MusicPlayer
             {
                 SongList.Items.Clear();
             }
-
 
             string cstring = "server = 192.168.16.178; uid = Sebastian; pwd = 123Abcd123; DATABASE = Music;";
 
@@ -65,13 +67,13 @@ namespace MusicPlayer
                 //MessageBox.Show($@"I: {index} | {paths[index]}");
                 file += Convert.ToString(dr.GetValue(2)) + ";";
             }
-
+            path = path.Remove(path.Length - 1);
+            file = file.Remove(file.Length - 1);
             paths = path.Split(';');
             files = file.Split(';');
-            filter.Remover(files, out files);
+            //filter.Remover(files, out files);
             for (int i = 0; i < files.Length; i++)
             {
-
                 SongList.Items.Add(files[i]);
             }
 
@@ -80,7 +82,7 @@ namespace MusicPlayer
             cmd.Cancel();
             conn.Close();
 
-            
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -94,17 +96,40 @@ namespace MusicPlayer
             
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                files = ofd.SafeFileNames;
-                paths = ofd.FileNames;
-                
-                //MessageBox.Show($"Files: {Convert.ToString(files[0])}  | Paths: {Convert.ToString(paths[0])}");
-                
-                for (int i = 0; i < files.Length; i++)
+                if (files != null)
                 {
-                    filter.Remover(files, out files);
-                    db.Insert(paths, files);
-                    SongList.Items.Add(files[i]);
+                    Array.Resize(ref files, (files.Length + ofd.SafeFileNames.Length));
+                    Array.Resize(ref paths, (paths.Length + ofd.FileNames.Length));
+
+                    for (int i = files.Length - ofd.SafeFileNames.Length; i < files.Length; i++)
+                    {
+                        files[i] = ofd.SafeFileNames[i - 1];
+                        paths[i] = ofd.FileNames[i - 1];
+
+                        SongList.Items.Add(files[i]);
+                    }
                 }
+                else
+                {
+                    Array.Resize(ref files, ofd.SafeFileNames.Length);
+                    Array.Resize(ref paths, ofd.FileNames.Length);
+
+                    for (int i = 0; i < files.Length; i++)
+                    {
+                        files[i] = ofd.SafeFileNames[i];
+                        paths[i] = ofd.FileNames[i];
+
+                        SongList.Items.Add(files[i]);
+                    }
+                }
+
+
+
+                db.Insert(paths, files, ofd);
+
+
+                //MessageBox.Show($"Files: {Convert.ToString(files[0])}  | Paths: {Convert.ToString(paths[0])}");
+
             }
         }
 
@@ -127,6 +152,7 @@ namespace MusicPlayer
                 if (SongList.Items == null)
                 {
                     SongList.Items.RemoveAt(i);
+                    
                 }
             }
 
@@ -146,7 +172,7 @@ namespace MusicPlayer
         );
         */
 
-        public void Insert(string[] paths, string[] files)
+        public void Insert(string[] paths, string[] files, OpenFileDialog ofd)
         {
             NameFilter filter = new NameFilter();
             string cstring = "server = 192.168.16.178; uid = Sebastian; pwd = 123Abcd123; DATABASE = Music;";
@@ -156,9 +182,9 @@ namespace MusicPlayer
             SqlConnection conn = new SqlConnection(cstring);
             conn.Open();
 
-            for (int i = 0; i < files.Length; i++)
+            for (int i = files.Length - ofd.SafeFileNames.Length; i < files.Length; i++)
             {
-                filter.Remover(files, out files);
+                //filter.Remover(files, out files);
                 cmd = new SqlCommand($"INSERT INTO Songs (path, song) VALUES ('{paths[i]}', '{files[i]}')", conn);
                 rows += cmd.ExecuteNonQuery();
                 cmd.Cancel();
