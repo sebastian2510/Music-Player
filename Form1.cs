@@ -30,8 +30,13 @@ namespace MusicPlayer
                 SongList.SelectedIndex = 0;
             }
 
-            MediaPlayer.URL = paths[SongList.SelectedIndex];
-            MessageBox.Show($@"Song: {files[SongList.SelectedIndex]} | Path: {paths[SongList.SelectedIndex]}");
+            if (File.Exists(paths[SongList.SelectedIndex]))
+            {
+                MediaPlayer.URL = paths[SongList.SelectedIndex];
+                MessageBox.Show($@"Song: {files[SongList.SelectedIndex]} | Path: {paths[SongList.SelectedIndex]}");
+            }
+            
+            
         }
 
         private void MediaPlayer_Enter(object sender, EventArgs e)
@@ -75,14 +80,26 @@ namespace MusicPlayer
 
             for (int i = 0; i < files.Length; i++)
             {
-                SongList.Items.Add(files[i]);
-            }
+                if (File.Exists(paths[i]))
+                {
+                    SongList.Items.Add(files[i]);
+                }
+                /* - Can't close the reader since i can't open it again while being in the loop
+                else
+                {
+                    dr.Close(); // Does not work
+                    cmd.Cancel(); // Does not work
 
+                    cmd = new SqlCommand($"DELETE FROM Songs WHERE path = '{paths[i]}'", conn);
+                    int pathdel = cmd.ExecuteNonQuery();
+                    MessageBox.Show($"Deleted song: {files[i]}");
+                }
+                */
+            }
+            
             dr.Close();
             cmd.Cancel();
             conn.Close();
-
-
         }
 
         private void button1_Click(object sender, EventArgs e)
