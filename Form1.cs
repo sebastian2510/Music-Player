@@ -35,8 +35,6 @@ namespace MusicPlayer
                 MediaPlayer.URL = paths[SongList.SelectedIndex];
                 MessageBox.Show($@"Song: {files[SongList.SelectedIndex]} | Path: {paths[SongList.SelectedIndex]}");
             }
-            
-            
         }
 
         private void MediaPlayer_Enter(object sender, EventArgs e)
@@ -47,59 +45,14 @@ namespace MusicPlayer
         private void Form_Load(object sender, EventArgs e)
         {
             NameFilter filter = new NameFilter();
+            DBHandler db = new DBHandler();
 
             if (SongList.Items.Count > 0)
             {
                 SongList.Items.Clear();
             }
 
-            string cstring = "server = 192.168.16.178; uid = Sebastian; pwd = 123Abcd123; DATABASE = Music;";
-
-            SqlConnection conn = new SqlConnection(cstring);
-            conn.Open();
-
-            SqlCommand cmd = new SqlCommand("SELECT * FROM Songs", conn);
-            SqlDataReader dr = cmd.ExecuteReader();
-
-            string path = "";
-            string file = "";
-
-            while (dr.Read())
-            {
-                //MessageBox.Show($"Songs: {Convert.ToString(dr.GetValue(2))}");
-                path += Convert.ToString(@dr.GetValue(1)) + ";";
-                //MessageBox.Show($@"I: {index} | {paths[index]}");
-                file += Convert.ToString(dr.GetValue(2)) + ";";
-            }
-
-            path = path.Remove(path.Length - 1);
-            file = file.Remove(file.Length - 1);
-
-            paths = path.Split(';');
-            files = file.Split(';');
-
-            for (int i = 0; i < files.Length; i++)
-            {
-                if (File.Exists(paths[i]))
-                {
-                    SongList.Items.Add(files[i]);
-                }
-                /* - Can't close the reader since i can't open it again while being in the loop
-                else
-                {
-                    dr.Close(); // Does not work
-                    cmd.Cancel(); // Does not work
-
-                    cmd = new SqlCommand($"DELETE FROM Songs WHERE path = '{paths[i]}'", conn);
-                    int pathdel = cmd.ExecuteNonQuery();
-                    MessageBox.Show($"Deleted song: {files[i]}");
-                }
-                */
-            }
-            
-            dr.Close();
-            cmd.Cancel();
-            conn.Close();
+            db.Load(SongList, files, paths, out files, out paths);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -146,32 +99,8 @@ namespace MusicPlayer
 
         private void RemoveSong_Click(object sender, EventArgs e)
         {
-            Deleter del = new Deleter();
-
-            string cstring = "server = 192.168.16.178; uid = Sebastian; pwd = 123Abcd123; DATABASE = Music;";
-
-            SqlCommand cmd = new SqlCommand();
-            SqlConnection conn = new SqlConnection(cstring);
-            conn.Open();
-
-            cmd = new SqlCommand($"DELETE FROM Songs WHERE song = '{files[SongList.SelectedIndex]}'", conn);
-            int rows = cmd.ExecuteNonQuery();
-            cmd.Cancel();
-
-            SongList.Items.Remove(files[SongList.SelectedIndex]);
-
-            for (int i = 0; i < SongList.Items.Count; i++)
-            {
-                if (SongList.Items == null)
-                {
-                    SongList.Items.RemoveAt(i);
-                    del.ArrDel(files, i, out files);
-                    del.ArrDel(paths, i, out paths);
-                }
-            }
-
-            MessageBox.Show($"Delete song(s): {rows}");
-            conn.Close();
+            DBHandler db = new DBHandler();
+            db.Delete(SongList, files, paths, out files, out paths);
         }
     }
     class DBHandler
@@ -206,6 +135,91 @@ namespace MusicPlayer
 
             MessageBox.Show($"Imported song(s): {rows}");
             conn.Close();
+        }
+
+        public void Load(ListBox SongList, string[] files, string[] paths, out string[] filesoutput, out string[] pathsoutput)
+        {
+            string cstring = "server = 192.168.16.178; uid = Sebastian; pwd = 123Abcd123; DATABASE = Music;";
+
+            SqlConnection conn = new SqlConnection(cstring);
+            conn.Open();
+
+            SqlCommand cmd = new SqlCommand("SELECT * FROM Songs", conn);
+            SqlDataReader dr = cmd.ExecuteReader();
+
+            string path = "";
+            string file = "";
+
+            while (dr.Read())
+            {
+                //MessageBox.Show($"Songs: {Convert.ToString(dr.GetValue(2))}");
+                path += Convert.ToString(@dr.GetValue(1)) + ";";
+                //MessageBox.Show($@"I: {index} | {paths[index]}");
+                file += Convert.ToString(dr.GetValue(2)) + ";";
+            }
+
+            path = path.Remove(path.Length - 1);
+            file = file.Remove(file.Length - 1);
+
+            paths = path.Split(';');
+            files = file.Split(';');
+
+            for (int i = 0; i < files.Length; i++)
+            {
+                if (File.Exists(paths[i]))
+                {
+                    SongList.Items.Add(files[i]);
+                }
+                /* - Can't close the reader since i can't open it again while being in the loop
+                else
+                {
+                    dr.Close(); // Does not work
+                    cmd.Cancel(); // Does not work
+
+                    cmd = new SqlCommand($"DELETE FROM Songs WHERE path = '{paths[i]}'", conn);
+                    int pathdel = cmd.ExecuteNonQuery();
+                    MessageBox.Show($"Deleted song: {files[i]}");
+                }
+                */
+            }
+
+            dr.Close();
+            cmd.Cancel();
+            conn.Close();
+            pathsoutput = paths;
+            filesoutput = files;
+        }
+
+        public void Delete(ListBox SongList, string[] files, string[] paths, out string[] filesoutput, out string[] pathsoutput)
+        {
+            Deleter del = new Deleter();
+
+            string cstring = "server = 192.168.16.178; uid = Sebastian; pwd = 123Abcd123; DATABASE = Music;";
+
+            SqlCommand cmd = new SqlCommand();
+            SqlConnection conn = new SqlConnection(cstring);
+            conn.Open();
+
+            cmd = new SqlCommand($"DELETE FROM Songs WHERE song = '{files[SongList.SelectedIndex]}'", conn);
+            int rows = cmd.ExecuteNonQuery();
+            cmd.Cancel();
+
+            SongList.Items.Remove(files[SongList.SelectedIndex]);
+
+            for (int i = 0; i < SongList.Items.Count; i++)
+            {
+                if (SongList.Items == null)
+                {
+                    SongList.Items.RemoveAt(i);
+                    del.ArrDel(files, i, out files);
+                    del.ArrDel(paths, i, out paths);
+                }
+            }
+
+            MessageBox.Show($"Delete song(s): {rows}");
+            conn.Close();
+            pathsoutput = paths;
+            filesoutput = files;
         }
     }
     class NameFilter
