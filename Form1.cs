@@ -69,26 +69,30 @@ namespace MusicPlayer
                 {
                     Array.Resize(ref files, (files.Length + ofd.SafeFileNames.Length));
                     Array.Resize(ref paths, (paths.Length + ofd.FileNames.Length));
+                    int j = 0;
 
                     for (int i = files.Length - ofd.SafeFileNames.Length; i < files.Length; i++)
                     {
-                        files[i] = ofd.SafeFileNames[i - 1];
-                        paths[i] = ofd.FileNames[i - 1];
+                        
+                        files[i] = ofd.SafeFileNames[j];
+                        paths[i] = ofd.FileNames[j];
 
                         SongList.Items.Add(files[i]);
+                        j++;
                     }
                 }
                 else
                 {
                     Array.Resize(ref files, ofd.SafeFileNames.Length);
                     Array.Resize(ref paths, ofd.FileNames.Length);
-
+                    int j = 0;
                     for (int i = 0; i < files.Length; i++)
                     {
-                        files[i] = ofd.SafeFileNames[i];
-                        paths[i] = ofd.FileNames[i];
+                        files[i] = ofd.SafeFileNames[j];
+                        paths[i] = ofd.FileNames[j];
 
                         SongList.Items.Add(files[i]);
+                        j++;
                     }
                 }
 
