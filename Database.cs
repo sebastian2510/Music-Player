@@ -31,7 +31,6 @@ namespace MusicPlayer
 
           public void Insert(List<string> paths, List<string> files, OpenFileDialog ofd)
           {
-             NameFilter filter = new NameFilter();
              string cstring = "server = 192.168.16.178; uid = Sebastian; pwd = 123Abcd123; DATABASE = Music;";
              int rows = 0;
 
