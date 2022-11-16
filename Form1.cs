@@ -14,8 +14,8 @@ namespace MusicPlayer
 {
     public partial class Form : System.Windows.Forms.Form
     {
-        string[] paths;
-        string[] files;
+        public List<string> paths = new List<string>();
+        public List<string> files = new List<string>();
         
         public Form()
         {
@@ -39,14 +39,26 @@ namespace MusicPlayer
 
         private void MediaPlayer_Enter(object sender, EventArgs e)
         {
-
+            while (MediaPlayer.playState != WMPLib.WMPPlayState.wmppsPlaying)
+            {
+                if (MediaPlayer.playState == WMPLib.WMPPlayState.wmppsStopped)
+                {
+                    if (SongList.SelectedIndex < paths.Count - 1)
+                    {
+                        MediaPlayer.URL = paths[SongList.SelectedIndex + 1];
+                    }
+                    else
+                    {
+                        MediaPlayer.URL = paths[0];
+                    }
+                }
+            }
         }
 
         private void Form_Load(object sender, EventArgs e)
         {
             NameFilter filter = new NameFilter();
             DBHandler db = new DBHandler();
-
             if (SongList.Items.Count > 0)
             {
                 SongList.Items.Clear();
@@ -67,33 +79,19 @@ namespace MusicPlayer
             {
                 if (files != null)
                 {
-                    Array.Resize(ref files, (files.Length + ofd.SafeFileNames.Length));
-                    Array.Resize(ref paths, (paths.Length + ofd.FileNames.Length));
-                    int j = 0;
-
-                    for (int i = files.Length - ofd.SafeFileNames.Length; i < files.Length; i++)
+                    files.AddRange(ofd.SafeFileNames);
+                    paths.AddRange(ofd.FileNames);
+                    for (int i = files.Count - ofd.SafeFileNames.Length; i < files.Count; i++)
                     {
-                        
-                        files[i] = ofd.SafeFileNames[j];
-                        paths[i] = ofd.FileNames[j];
-
                         SongList.Items.Add(files[i]);
-                        j++;
                     }
+                    
                 }
                 else
                 {
-                    Array.Resize(ref files, ofd.SafeFileNames.Length);
-                    Array.Resize(ref paths, ofd.FileNames.Length);
-                    int j = 0;
-                    for (int i = 0; i < files.Length; i++)
-                    {
-                        files[i] = ofd.SafeFileNames[j];
-                        paths[i] = ofd.FileNames[j];
-
-                        SongList.Items.Add(files[i]);
-                        j++;
-                    }
+                    files.AddRange(ofd.SafeFileNames);
+                    paths.AddRange(ofd.FileNames);
+                    SongList.Items.Add(files);
                 }
 
                 db.Insert(paths, files, ofd);
@@ -104,7 +102,7 @@ namespace MusicPlayer
         private void RemoveSong_Click(object sender, EventArgs e)
         {
             DBHandler db = new DBHandler();
-            db.Delete(SongList, files, paths, out files, out paths);
+            db.Delete(SongList, out SongList, files, paths, out files, out paths);
         }
     }
     class DBHandler
@@ -119,7 +117,7 @@ namespace MusicPlayer
         );
         */
 
-        public void Insert(string[] paths, string[] files, OpenFileDialog ofd)
+        public void Insert(List<string> paths, List<string> files, OpenFileDialog ofd)
         {
             NameFilter filter = new NameFilter();
             string cstring = "server = 192.168.16.178; uid = Sebastian; pwd = 123Abcd123; DATABASE = Music;";
@@ -129,7 +127,7 @@ namespace MusicPlayer
             SqlConnection conn = new SqlConnection(cstring);
             conn.Open();
 
-            for (int i = files.Length - ofd.SafeFileNames.Length; i < files.Length; i++)
+            for (int i = files.Count - ofd.SafeFileNames.Length; i < files.Count; i++)
             {
                 //filter.Remover(files, out files);
                 cmd = new SqlCommand($"INSERT INTO Songs (path, song) VALUES ('{paths[i]}', '{files[i]}')", conn);
@@ -141,7 +139,7 @@ namespace MusicPlayer
             conn.Close();
         }
 
-        public void Load(ListBox SongList, string[] files, string[] paths, out string[] filesoutput, out string[] pathsoutput)
+        public void Load(ListBox SongList, List<string> files, List<string> paths, out List<string> filesoutput, out List<string> pathsoutput)
         {
             string cstring = "server = 192.168.16.178; uid = Sebastian; pwd = 123Abcd123; DATABASE = Music;";
 
@@ -151,24 +149,15 @@ namespace MusicPlayer
             SqlCommand cmd = new SqlCommand("SELECT * FROM Songs", conn);
             SqlDataReader dr = cmd.ExecuteReader();
 
-            string path = "";
-            string file = "";
-
             while (dr.Read())
             {
                 //MessageBox.Show($"Songs: {Convert.ToString(dr.GetValue(2))}");
-                path += Convert.ToString(@dr.GetValue(1)) + ";";
+                paths.Add(Convert.ToString(@dr.GetValue(1)));
                 //MessageBox.Show($@"I: {index} | {paths[index]}");
-                file += Convert.ToString(dr.GetValue(2)) + ";";
+                files.Add(Convert.ToString(dr.GetValue(2)));
             }
 
-            path = path.Remove(path.Length - 1);
-            file = file.Remove(file.Length - 1);
-
-            paths = path.Split(';');
-            files = file.Split(';');
-
-            for (int i = 0; i < files.Length; i++)
+            for (int i = 0; i < files.Count; i++)
             {
                 if (File.Exists(paths[i]))
                 {
@@ -194,10 +183,8 @@ namespace MusicPlayer
             filesoutput = files;
         }
 
-        public void Delete(ListBox SongList, string[] files, string[] paths, out string[] filesoutput, out string[] pathsoutput)
+        public void Delete(ListBox SongList, out ListBox Songs, List<string> files, List<string> paths, out List<string> filesoutput, out List<string> pathsoutput)
         {
-            Deleter del = new Deleter();
-
             string cstring = "server = 192.168.16.178; uid = Sebastian; pwd = 123Abcd123; DATABASE = Music;";
 
             SqlCommand cmd = new SqlCommand();
@@ -215,11 +202,11 @@ namespace MusicPlayer
                 if (SongList.Items == null)
                 {
                     SongList.Items.RemoveAt(i);
-                    del.ArrDel(files, i, out files);
-                    del.ArrDel(paths, i, out paths);
+                    files.RemoveAt(i);
+                    paths.RemoveAt(i);
                 }
             }
-
+            Songs = SongList;
             MessageBox.Show($"Delete song(s): {rows}");
             conn.Close();
             pathsoutput = paths;
@@ -273,7 +260,7 @@ namespace MusicPlayer
     }
     class Deleter
     {
-        public void ArrDel(string[] files, int i, out string[] output)
+        public void ArrDel(string[] files, int i, out string[] output) // Not relevant anymore since it's moved to an list
         {
             string file = "";
 
