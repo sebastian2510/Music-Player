@@ -5,7 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.IO;
 using System.Windows.Forms;
 using System.Data.SqlClient;
@@ -25,38 +25,21 @@ namespace MusicPlayer
         private void SongList_SelectedIndexChanged(object sender, EventArgs e)
         {
             //MessageBox.Show($"PRE: {SongList.SelectedIndex}");
-            if (SongList.SelectedIndex > SongList.Items.Count || SongList.SelectedIndex < 0)
-            {
-                SongList.SelectedIndex = 0;
-            }
 
             if (File.Exists(paths[SongList.SelectedIndex]))
             {
-                MediaPlayer.URL = paths[SongList.SelectedIndex];
+                PlaySong(paths[SongList.SelectedIndex]);
                 //MessageBox.Show($@"Song: {files[SongList.SelectedIndex]} | Path: {paths[SongList.SelectedIndex]}");
             }
         }
 
         private void MediaPlayer_Enter(object sender, EventArgs e)
         {
-            while (MediaPlayer.playState != WMPLib.WMPPlayState.wmppsPlaying)
-            {
-                if (MediaPlayer.playState == WMPLib.WMPPlayState.wmppsStopped)
-                {
-                    if (SongList.SelectedIndex < paths.Count - 1)
-                    {
-                        MediaPlayer.URL = paths[SongList.SelectedIndex + 1];
-                    }
-                    else
-                    {
-                        MediaPlayer.URL = paths[0];
-                    }
-                }
-            }
         }
 
         private void Form_Load(object sender, EventArgs e)
         {
+            
             DBHandler db = new DBHandler();
             if (SongList.Items.Count > 0)
             {
@@ -101,6 +84,53 @@ namespace MusicPlayer
         {
             DBHandler db = new DBHandler();
             db.Delete(SongList, out SongList, files, paths, out files, out paths);
+        }
+        private void MediaPlayerStateChangeEvent(object sender, AxWMPLib._WMPOCXEvents_PlayStateChangeEvent e)
+        {
+            
+            if (e.newState == 0)
+            {
+                // undefined loaded
+            }
+            else if (e.newState == 1)
+            {
+                // if the file is stopped 
+            }
+            else if (e.newState == 3)
+            {
+                // if the file is playing 
+            }
+            else if (e.newState == 8)
+            {
+                if (SongList.SelectedIndex < (paths.Count - 1))
+                {
+                    SongList.SelectedIndex++;
+                }
+                else
+                {
+                    SongList.SelectedIndex = 0;
+                }
+            }
+            else if (e.newState == 9)
+            {
+                // if the media player is loading new video
+            }
+            else if (e.newState == 10)
+            {
+                // media is ready to play again
+                timer1.Start();
+            }
+        }
+
+        public void PlaySong(string path)
+        {
+            MediaPlayer.URL = path;
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            MediaPlayer.Ctlcontrols.play();
+            timer1.Stop();  
         }
     }
 }

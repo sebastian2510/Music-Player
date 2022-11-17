@@ -28,11 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form));
             this.SongList = new System.Windows.Forms.ListBox();
             this.ImportSong = new System.Windows.Forms.Button();
             this.MediaPlayer = new AxWMPLib.AxWindowsMediaPlayer();
             this.RemoveSong = new System.Windows.Forms.Button();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.MediaPlayer)).BeginInit();
             this.SuspendLayout();
             // 
@@ -68,6 +70,7 @@
             this.MediaPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("MediaPlayer.OcxState")));
             this.MediaPlayer.Size = new System.Drawing.Size(554, 391);
             this.MediaPlayer.TabIndex = 7;
+            this.MediaPlayer.PlayStateChange += new AxWMPLib._WMPOCXEvents_PlayStateChangeEventHandler(this.MediaPlayerStateChangeEvent);
             this.MediaPlayer.Enter += new System.EventHandler(this.MediaPlayer_Enter);
             // 
             // RemoveSong
@@ -83,6 +86,10 @@
             this.RemoveSong.Text = "Remove song(s)";
             this.RemoveSong.UseVisualStyleBackColor = false;
             this.RemoveSong.Click += new System.EventHandler(this.RemoveSong_Click);
+            // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // Form
             // 
@@ -107,6 +114,7 @@
         private System.Windows.Forms.Button ImportSong;
         private AxWMPLib.AxWindowsMediaPlayer MediaPlayer;
         private System.Windows.Forms.Button RemoveSong;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 
