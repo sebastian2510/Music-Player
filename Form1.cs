@@ -1,14 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.IO;
 using System.Windows.Forms;
-using System.Data.SqlClient;
 
 namespace MusicPlayer
 {
@@ -16,7 +9,7 @@ namespace MusicPlayer
     {
         public List<string> paths = new List<string>();
         public List<string> files = new List<string>();
-        
+
         public Form()
         {
             InitializeComponent();
@@ -25,7 +18,7 @@ namespace MusicPlayer
         private void SongList_SelectedIndexChanged(object sender, EventArgs e)
         {
             //MessageBox.Show($"PRE: {SongList.SelectedIndex}");
-
+            
             if (File.Exists(paths[SongList.SelectedIndex]))
             {
                 PlaySong(paths[SongList.SelectedIndex]);
@@ -39,7 +32,6 @@ namespace MusicPlayer
 
         private void Form_Load(object sender, EventArgs e)
         {
-            
             DBHandler db = new DBHandler();
             if (SongList.Items.Count > 0)
             {
@@ -54,8 +46,8 @@ namespace MusicPlayer
             DBHandler db = new DBHandler();
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Multiselect = true;
-            
-            
+
+
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 if (files != null)
@@ -87,7 +79,7 @@ namespace MusicPlayer
         }
         private void MediaPlayerStateChangeEvent(object sender, AxWMPLib._WMPOCXEvents_PlayStateChangeEvent e)
         {
-            
+
             if (e.newState == 0)
             {
                 // undefined loaded
@@ -130,7 +122,7 @@ namespace MusicPlayer
         private void timer1_Tick(object sender, EventArgs e)
         {
             MediaPlayer.Ctlcontrols.play();
-            timer1.Stop();  
+            timer1.Stop();
         }
     }
 }
