@@ -86,6 +86,52 @@ namespace MusicPlayer
             pathsoutput = paths;
             filesoutput = files;
         }
+        /* - Search function, but it bugs 
+        public void Search(ListBox SongList, List<string> files, List<string> paths, out List<string> filesoutput, out List<string> pathsoutput, TextBox text)
+        {
+            string cstring = "server = 192.168.16.178; uid = Sebastian; pwd = 123Abcd123; DATABASE = Music;";
+
+            SqlConnection conn = new SqlConnection(cstring);
+            conn.Open();
+            
+            SqlCommand cmd = new SqlCommand($"SELECT * FROM Songs WHERE song LIKE '%{text.Text}%'", conn);
+            SqlDataReader dr = cmd.ExecuteReader();
+
+
+            while (dr.Read())
+            {
+                //MessageBox.Show($"Songs: {Convert.ToString(dr.GetValue(2))}");
+                paths.Add(Convert.ToString(@dr.GetValue(1)));
+                //MessageBox.Show($@"I: {index} | {paths[index]}");
+                files.Add(Convert.ToString(dr.GetValue(2)));
+            }
+
+            SongList.Items.Clear();
+            for (int i = 0; i < files.Count; i++)
+            {
+                if (File.Exists(paths[i]))
+                {
+                    SongList.Items.Add(files[i]);
+                }
+                /* - Can't close the reader since i can't open it again while being in the loop
+                else
+                {
+                    dr.Close(); // Does not work
+                    cmd.Cancel(); // Does not work
+
+                     cmd = new SqlCommand($"DELETE FROM Songs WHERE path = '{paths[i]}'", conn);
+                    int pathdel = cmd.ExecuteNonQuery();
+                    MessageBox.Show($"Deleted song: {files[i]}");
+                }
+                -- 
+            }
+
+            dr.Close();
+            cmd.Cancel();
+            conn.Close();
+            pathsoutput = paths;
+            filesoutput = files;
+        } */
 
         public void Delete(ListBox SongList, out ListBox Songs, List<string> files, List<string> paths, out List<string> filesoutput, out List<string> pathsoutput)
         {

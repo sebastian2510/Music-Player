@@ -79,7 +79,6 @@ namespace MusicPlayer
         }
         private void MediaPlayerStateChangeEvent(object sender, AxWMPLib._WMPOCXEvents_PlayStateChangeEvent e)
         {
-
             if (e.newState == 0)
             {
                 // undefined loaded
